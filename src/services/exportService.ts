@@ -1,6 +1,12 @@
-import { marked } from 'marked';
-import { FileNode, PreviewTheme } from '../types';
-import { themeService } from './themeService';
+import { FileNode, MarkdownFeatures, PreviewTheme } from "../types";
+import { themeService } from "./themeService";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import remarkRehype from "remark-rehype";
+import rehypeKatex from "rehype-katex";
+import rehypeStringify from "rehype-stringify";
 
 export const exportService = {
   /**
@@ -9,7 +15,7 @@ export const exportService = {
   downloadFile(filename: string, content: string, contentType: string) {
     const blob = new Blob([content], { type: contentType });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
     link.download = filename;
     document.body.appendChild(link);
@@ -22,8 +28,8 @@ export const exportService = {
    * Export as raw Markdown file (.md)
    */
   exportMarkdown(file: FileNode) {
-    const filename = file.name.endsWith('.md') ? file.name : `${file.name}.md`;
-    this.downloadFile(filename, file.content, 'text/markdown');
+    const filename = file.name.endsWith(".md") ? file.name : `${file.name}.md`;
+    this.downloadFile(filename, file.content, "text/markdown");
   },
 
   /**
@@ -32,15 +38,29 @@ export const exportService = {
   exportJSON(file: FileNode) {
     const filename = file.name.replace(/\.[^/.]+$/, "") + ".json";
     const content = JSON.stringify(file, null, 2);
-    this.downloadFile(filename, content, 'application/json');
+    this.downloadFile(filename, content, "application/json");
   },
 
   /**
    * Get the styled HTML string for HTML export or PDF printing
    */
-  getStyledHTML(content: string, title: string, theme: PreviewTheme): string {
-    const rawHtml = marked.parse(content) as string;
-    
+  getStyledHTML(
+    content: string,
+    title: string,
+    theme: PreviewTheme,
+    features?: Pick<MarkdownFeatures, "math">
+  ): string {
+    // Use the same markdown pipeline style as the preview (GFM + optional math)
+    // so features like footnotes render as in-document anchors (e.g. #fn-1)
+    // instead of being misinterpreted as link reference definitions.
+    const processor = unified().use(remarkParse).use(remarkGfm);
+    if (features?.math) processor.use(remarkMath);
+    processor.use(remarkRehype);
+    if (features?.math) processor.use(rehypeKatex);
+    processor.use(rehypeStringify);
+
+    const rawHtml = processor.processSync(content).toString();
+
     // Get CSS from central service, forcing export mode (Light Mode defaults usually)
     const css = themeService.getThemeCSS(theme, true);
 
@@ -85,31 +105,49 @@ export const exportService = {
   /**
    * Export as Styled HTML file (.html)
    */
-  exportHTML(file: FileNode, theme: PreviewTheme = 'github') {
+  exportHTML(
+    file: FileNode,
+    theme: PreviewTheme = "github",
+    features?: Pick<MarkdownFeatures, "math">
+  ) {
     const filename = file.name.replace(/\.[^/.]+$/, "") + ".html";
-    const htmlContent = this.getStyledHTML(file.content, file.name, theme);
-    this.downloadFile(filename, htmlContent, 'text/html');
+    const htmlContent = this.getStyledHTML(
+      file.content,
+      file.name,
+      theme,
+      features
+    );
+    this.downloadFile(filename, htmlContent, "text/html");
   },
 
   /**
    * Export as PDF (triggers Browser Print Dialog)
    */
-  exportPDF(file: FileNode, theme: PreviewTheme = 'github') {
-    const htmlContent = this.getStyledHTML(file.content, file.name, theme);
-    
+  exportPDF(
+    file: FileNode,
+    theme: PreviewTheme = "github",
+    features?: Pick<MarkdownFeatures, "math">
+  ) {
+    const htmlContent = this.getStyledHTML(
+      file.content,
+      file.name,
+      theme,
+      features
+    );
+
     // Open a new window, write content, and print
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     if (printWindow) {
-        printWindow.document.write(htmlContent);
-        printWindow.document.close();
-        
-        // Wait for resources to load (e.g. if we had images) then print
-        printWindow.onload = () => {
-            printWindow.focus();
-            printWindow.print();
-        };
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+
+      // Wait for resources to load (e.g. if we had images) then print
+      printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+      };
     } else {
-        alert("Please allow popups to export as PDF.");
+      alert("Please allow popups to export as PDF.");
     }
-  }
+  },
 };

@@ -24,6 +24,7 @@ const Header: React.FC = () => {
     openPalette,
     previewTheme,
     openMetadata,
+    features,
   } = useApp();
   const activeFile = files.find((f) => f.id === activeFileId);
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -52,10 +53,14 @@ const Header: React.FC = () => {
         exportService.exportMarkdown(activeFile);
         break;
       case "html":
-        exportService.exportHTML(activeFile, previewTheme);
+        exportService.exportHTML(activeFile, previewTheme, {
+          math: features.math,
+        });
         break;
       case "pdf":
-        exportService.exportPDF(activeFile, previewTheme);
+        exportService.exportPDF(activeFile, previewTheme, {
+          math: features.math,
+        });
         break;
       case "json":
         exportService.exportJSON(activeFile);

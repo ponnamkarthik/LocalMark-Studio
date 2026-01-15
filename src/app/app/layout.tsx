@@ -7,10 +7,10 @@ export const metadata: Metadata = {
   description:
     "Open the LocalMark Studio editor — a local-first Markdown editor with file management, intelligent paste, and split-pane preview.",
   alternates: {
-    canonical: "/editor",
+    canonical: "/app",
   },
   openGraph: {
-    url: "/editor",
+    url: "/app",
     title: `Editor | ${siteTitle}`,
     description:
       "Open the LocalMark Studio editor — a local-first Markdown editor with file management, intelligent paste, and split-pane preview.",

@@ -95,7 +95,7 @@ export default function Page() {
           </div>
 
           <Link
-            href="/editor"
+              href="/app"
             className="inline-flex items-center gap-2 rounded-md bg-theme-accent px-4 py-2 text-sm font-semibold text-black hover:bg-theme-accent-hover"
           >
             Open Editor <ArrowRight size={16} />
@@ -121,7 +121,7 @@ export default function Page() {
 
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link
-                href="/editor"
+                href="/app"
                 className="inline-flex items-center justify-center gap-2 rounded-md bg-theme-accent px-5 py-2.5 text-sm font-semibold text-black hover:bg-theme-accent-hover"
               >
                 Launch the editor <ArrowRight size={16} />
@@ -331,7 +331,7 @@ export default function Page() {
                 automatically.
               </div>
               <Link
-                href="/editor"
+                href="/app"
                 className="inline-flex items-center gap-2 rounded-md bg-theme-accent px-4 py-2 text-sm font-semibold text-black hover:bg-theme-accent-hover"
               >
                 Try it now <ArrowRight size={16} />
@@ -383,7 +383,7 @@ export default function Page() {
               <a href="#faq" className="hover:text-theme-text-main">
                 FAQ
               </a>
-              <Link href="/editor" className="hover:text-theme-text-main">
+              <Link href="/app" className="hover:text-theme-text-main">
                 Open Editor
               </Link>
               <Link href="/privacy" className="hover:text-theme-text-main">
