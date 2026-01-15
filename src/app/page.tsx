@@ -95,7 +95,7 @@ export default function Page() {
           </div>
 
           <Link
-              href="/app"
+            href="/app"
             className="inline-flex items-center gap-2 rounded-md bg-theme-accent px-4 py-2 text-sm font-semibold text-black hover:bg-theme-accent-hover"
           >
             Open Editor <ArrowRight size={16} />
