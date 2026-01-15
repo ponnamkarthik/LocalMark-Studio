@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg-main: #0f1115;
+  --bg-header: #13161b;
+  --bg-sidebar: #13161b;
+  --bg-activity: #1a1d23;
+  --bg-hover: #1f242c;
+  --bg-active: #262b36;
+  --border-color: #2a2f3a;
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-dim: #475569;
+  --accent-primary: #10b981;
+  --accent-hover: #059669;
+}
+
+html.light {
+  --bg-main: #ffffff;
+  --bg-header: #f8fafc;
+  --bg-sidebar: #f8fafc;
+  --bg-activity: #f1f5f9;
+  --bg-hover: #e2e8f0;
+  --bg-active: #cbd5e1;
+  --border-color: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #94a3b8;
+  --accent-primary: #059669;
+  --accent-hover: #047857;
+}
+
+@theme inline {
+  --color-theme-bg: var(--bg-main);
+  --color-theme-header: var(--bg-header);
+  --color-theme-sidebar: var(--bg-sidebar);
+  --color-theme-activity: var(--bg-activity);
+  --color-theme-hover: var(--bg-hover);
+  --color-theme-active: var(--bg-active);
+  --color-theme-border: var(--border-color);
+
+  --color-theme-text-main: var(--text-main);
+  --color-theme-text-muted: var(--text-muted);
+  --color-theme-text-dim: var(--text-dim);
+
+  --color-theme-accent: var(--accent-primary);
+  --color-theme-accent-hover: var(--accent-hover);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-active);
+  border-radius: 4px;
+  border: 2px solid var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  overflow: hidden;
+}

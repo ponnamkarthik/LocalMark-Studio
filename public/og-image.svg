@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1115" />
+      <stop offset="1" stop-color="#13161b" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10b981" />
+      <stop offset="1" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)" />
+
+  <circle cx="980" cy="120" r="220" fill="url(#accent)" opacity="0.12" />
+  <circle cx="220" cy="560" r="260" fill="url(#accent)" opacity="0.10" />
+
+  <rect x="90" y="120" width="1020" height="390" rx="28" fill="#0b0d11" opacity="0.55" />
+  <rect x="110" y="140" width="180" height="18" rx="9" fill="url(#accent)" opacity="0.8" />
+  <rect x="110" y="178" width="360" height="10" rx="5" fill="#94a3b8" opacity="0.35" />
+  <rect x="110" y="204" width="300" height="10" rx="5" fill="#94a3b8" opacity="0.25" />
+
+  <text x="110" y="310" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="68" font-weight="800" fill="#e2e8f0">
+    LocalMark Studio
+  </text>
+  <text x="110" y="366" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="28" font-weight="500" fill="#94a3b8">
+    A local-first Markdown editor for fast, private note-taking
+  </text>
+  <text x="110" y="420" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="22" font-weight="500" fill="#94a3b8" opacity="0.9">
+    A local-first Markdown editor with file management, intelligent paste, and split-pane preview.
+  </text>
+</svg>
