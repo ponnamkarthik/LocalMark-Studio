@@ -4,14 +4,15 @@ import "katex/dist/katex.min.css";
 import KofiWidget from "../components/KofiWidget";
 
 const siteTitle = "LocalMark Studio";
+const siteTitleWithKeyword = `${siteTitle} — Local-first Markdown Editor`;
 const siteDescription =
   "A local-first Markdown editor with file management, intelligent paste, and split-pane preview.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://editor.karthikponnam.dev"),
   title: {
-    default: siteTitle,
-    template: `%s | ${siteTitle}`,
+    default: siteTitleWithKeyword,
+    template: `%s | ${siteTitleWithKeyword}`,
   },
   description: siteDescription,
   keywords: [
@@ -40,6 +41,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: siteTitle,
+    title: siteTitleWithKeyword,
+    description: siteDescription,
+    url: "/",
     images: [
       {
         url: "/og-image.svg",
@@ -51,12 +55,17 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    title: siteTitleWithKeyword,
+    description: siteDescription,
     images: ["/og-image.svg"],
   },
 
   icons: {
-    icon: "/icon-192.png",
-    shortcut: "/icon.svg",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    shortcut: "/favicon.ico",
     apple: "/icon-192.png",
   },
 };
@@ -74,8 +83,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        {/* Some SEO checkers only look for /favicon.ico explicitly */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="shortcut icon" href="/icon.svg" />
+        <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
       <body>

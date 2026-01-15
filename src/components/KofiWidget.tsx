@@ -20,6 +20,8 @@ export default function KofiWidget() {
         src="https://storage.ko-fi.com/cdn/cup-border.png"
         className="mr-2 h-6 w-6"
         data-rotation="0"
+        alt=""
+        aria-hidden="true"
       ></img>
       {kofiConfig.buttonText}
     </a>
