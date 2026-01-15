@@ -11,6 +11,7 @@ import {
   EyeOff,
   PanelLeft,
   Download,
+  Upload,
   Sun,
   Moon,
   RefreshCw,
@@ -44,6 +45,10 @@ interface UseCommandPaletteCommandsArgs {
     name: string,
     type: "file" | "folder"
   ) => Promise<void>;
+  openImport?: () => void;
+  refreshFiles?: () => Promise<void>;
+  renameNode?: (id: string, newName: string) => Promise<void>;
+  deleteNode?: (id: string) => Promise<void>;
   togglePreview: () => void;
   toggleSidebar: () => void;
   setTheme: Dispatch<SetStateAction<"dark" | "light">>;
@@ -64,6 +69,10 @@ export function useCommandPaletteCommands({
   editorRef,
   monacoRef,
   createFile,
+  openImport,
+  refreshFiles,
+  renameNode,
+  deleteNode,
   togglePreview,
   toggleSidebar,
   setTheme,
@@ -76,6 +85,31 @@ export function useCommandPaletteCommands({
     const activeFile = files.find((f) => f.id === activeFileId);
 
     const cmds: PaletteCommand[] = [
+      ...(openImport
+        ? [
+            {
+              id: "import-file",
+              label: "Import File",
+              description:
+                "Import .md or HTML (auto-convert) into your workspace",
+              group: "general",
+              icon: Upload,
+              action: openImport,
+            } as PaletteCommand,
+          ]
+        : []),
+      ...(refreshFiles
+        ? [
+            {
+              id: "refresh-files",
+              label: "Refresh Files",
+              description: "Reload the file list from local storage",
+              group: "general",
+              icon: RefreshCw,
+              action: () => void refreshFiles(),
+            } as PaletteCommand,
+          ]
+        : []),
       {
         id: "insert-table",
         label: "Insert Table (3x3)",
@@ -283,6 +317,10 @@ export function useCommandPaletteCommands({
     features,
     previewTheme,
     createFile,
+    openImport,
+    refreshFiles,
+    renameNode,
+    deleteNode,
     togglePreview,
     toggleSidebar,
     setTheme,

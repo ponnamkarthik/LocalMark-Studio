@@ -21,6 +21,7 @@ import { AppContext } from "../AppContext";
 import { buildTree } from "../utils/buildTree";
 import { useCommandPaletteCommands } from "../hooks/useCommandPaletteCommands";
 import { useScrollSync } from "../hooks/useScrollSync";
+import { htmlToMarkdown } from "../services/turndownService";
 
 const EditorArea = dynamic(() => import("../components/EditorArea"), {
   ssr: false,
@@ -82,6 +83,13 @@ const EditorApp: React.FC = () => {
   const lastAutoExpandedFileIdRef = useRef<string | null>(null);
 
   const [isHydrated, setIsHydrated] = useState(false);
+
+  // Import picker (shared between Header + Command Palette)
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const openImport = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
 
   // --- Persistence Effects ---
 
@@ -330,6 +338,37 @@ const EditorApp: React.FC = () => {
     setActiveFileId(newNode.id);
   };
 
+  const handleImportFileSelect = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        let content = text;
+        let name = file.name;
+
+        // If it's an HTML file, convert to Markdown
+        if (
+          name.toLowerCase().endsWith(".html") ||
+          name.toLowerCase().endsWith(".htm")
+        ) {
+          content = htmlToMarkdown(text);
+          name = name.replace(/\.html?$/i, ".md");
+        }
+
+        await importFile(name, content);
+      } catch (error) {
+        console.error("Failed to import file", error);
+        alert("Failed to read file.");
+      }
+
+      // Reset input so same file can be selected again if needed
+      e.target.value = "";
+    },
+    []
+  );
+
   const updateFileContent = async (id: string, content: string) => {
     const file = files.find((f) => f.id === id);
     if (file) {
@@ -413,6 +452,10 @@ const EditorApp: React.FC = () => {
     editorRef,
     monacoRef,
     createFile,
+    openImport,
+    refreshFiles,
+    renameNode,
+    deleteNode,
     togglePreview,
     toggleSidebar,
     setTheme,
@@ -444,6 +487,7 @@ const EditorApp: React.FC = () => {
         refreshFiles,
         createFile,
         importFile,
+        openImport,
         updateFileContent,
         updateFileMetadata,
         renameNode,
@@ -462,6 +506,13 @@ const EditorApp: React.FC = () => {
       }}
     >
       <div className="flex flex-col h-screen w-screen bg-theme-bg text-theme-text-main overflow-hidden font-sans">
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleImportFileSelect}
+          className="hidden"
+          accept=".md,.markdown,.txt,.html,.htm"
+        />
         <Header />
 
         <div className="flex-1 flex overflow-hidden min-h-0">

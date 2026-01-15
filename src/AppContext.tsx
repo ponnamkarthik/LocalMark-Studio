@@ -1,5 +1,11 @@
-import { createContext, useContext } from 'react';
-import { FileNode, FileTreeItem, ScrollPosition, MarkdownFeatures, PreviewTheme } from './types';
+import { createContext, useContext } from "react";
+import {
+  FileNode,
+  FileTreeItem,
+  ScrollPosition,
+  MarkdownFeatures,
+  PreviewTheme,
+} from "./types";
 
 export interface AppContextType {
   files: FileNode[];
@@ -10,10 +16,19 @@ export interface AppContextType {
   features: MarkdownFeatures;
   previewTheme: PreviewTheme;
   refreshFiles: () => Promise<void>;
-  createFile: (parentId: string | null, name: string, type: 'file' | 'folder') => Promise<void>;
+  createFile: (
+    parentId: string | null,
+    name: string,
+    type: "file" | "folder"
+  ) => Promise<void>;
   importFile: (name: string, content: string) => Promise<void>;
+  openImport: () => void;
   updateFileContent: (id: string, content: string) => Promise<void>;
-  updateFileMetadata: (id: string, tags: string[], metadata: Record<string, string>) => Promise<void>;
+  updateFileMetadata: (
+    id: string,
+    tags: string[],
+    metadata: Record<string, string>
+  ) => Promise<void>;
   renameNode: (id: string, newName: string) => Promise<void>;
   deleteNode: (id: string) => Promise<void>;
   setActiveFile: (id: string | null) => void;
