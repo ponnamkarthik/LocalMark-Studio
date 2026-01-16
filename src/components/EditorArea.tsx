@@ -50,6 +50,7 @@ const EditorArea: React.FC<EditorAreaProps> = ({
   const {
     files,
     activeFileId,
+    theme,
     updateFileContent,
     showPreview,
     togglePreview,
@@ -429,8 +430,8 @@ const EditorArea: React.FC<EditorAreaProps> = ({
         typeof action === "string" ? insertFormat(action) : action();
       }}
       className={`p-1.5 rounded-md transition-colors ${
-        active ? "bg-theme-active text-white" : "hover:bg-theme-hover"
-      } ${colorClass || "text-theme-text-muted hover:text-white"}`}
+        active ? "bg-theme-active text-theme-text-main" : "hover:bg-theme-hover"
+      } ${colorClass || "text-theme-text-muted hover:text-theme-text-main"}`}
       title={title}
     >
       <Icon size={16} strokeWidth={2} />
@@ -672,7 +673,7 @@ const EditorArea: React.FC<EditorAreaProps> = ({
         <Editor
           height="100%"
           width="100%"
-          theme="vs-dark"
+          theme={theme === "dark" ? "vs-dark" : "vs"}
           path={activeFile.id}
           defaultLanguage="markdown"
           value={activeFile.content}

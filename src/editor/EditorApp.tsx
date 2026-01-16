@@ -51,12 +51,18 @@ const EditorApp: React.FC = () => {
 
   // Theme State (App Dark/Light)
   const [theme, setTheme] = useState<"dark" | "light">(() => {
-    if (typeof window !== "undefined") {
-      return document.documentElement.classList.contains("dark")
-        ? "dark"
-        : "light";
+    if (typeof window === "undefined") return "dark";
+
+    try {
+      const savedTheme = localStorage.getItem("localmark_theme");
+      if (savedTheme === "dark" || savedTheme === "light") return savedTheme;
+    } catch {}
+
+    try {
+      return "dark";
+    } catch {
+      return "dark";
     }
-    return "dark";
   });
 
   // Preview Theme
@@ -147,6 +153,13 @@ const EditorApp: React.FC = () => {
       }
     } catch {}
 
+    try {
+      const savedTheme = localStorage.getItem("localmark_theme");
+      if (savedTheme === "dark" || savedTheme === "light") {
+        setTheme(savedTheme);
+      }
+    } catch {}
+
     setIsHydrated(true);
   }, []);
 
@@ -185,6 +198,11 @@ const EditorApp: React.FC = () => {
     localStorage.setItem("localmark_previewTheme", previewTheme);
   }, [previewTheme, isHydrated]);
 
+  useEffect(() => {
+    if (!isHydrated) return;
+    localStorage.setItem("localmark_theme", theme);
+  }, [theme, isHydrated]);
+
   // Theme Effect
   useEffect(() => {
     const root = document.documentElement;
@@ -196,6 +214,10 @@ const EditorApp: React.FC = () => {
       root.classList.add("light");
     }
   }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  }, []);
 
   // Auto-expand folders when active file changes
   useEffect(() => {
@@ -482,6 +504,7 @@ const EditorApp: React.FC = () => {
         expandedFolders,
         showPreview,
         showSidebar,
+        theme,
         features,
         previewTheme,
         refreshFiles,
@@ -496,6 +519,8 @@ const EditorApp: React.FC = () => {
         toggleFolder,
         togglePreview,
         toggleSidebar,
+        setTheme,
+        toggleTheme,
         toggleFeature,
         setPreviewTheme,
         openPalette,

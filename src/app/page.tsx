@@ -15,6 +15,7 @@ import {
   Tags,
   Wand2,
 } from "lucide-react";
+import ThemeToggleButton from "../components/ThemeToggleButton";
 
 const siteTitle = "LocalMark Studio";
 const siteDescription =
@@ -94,12 +95,15 @@ export default function Page() {
             </a>
           </div>
 
-          <Link
-            href="/app"
-            className="inline-flex items-center gap-2 rounded-md bg-theme-accent px-4 py-2 text-sm font-semibold text-black hover:bg-theme-accent-hover"
-          >
-            Open Editor <ArrowRight size={16} />
-          </Link>
+          <div className="flex items-center gap-3">
+            <ThemeToggleButton />
+            <Link
+              href="/app"
+              className="inline-flex items-center gap-2 rounded-md bg-theme-accent px-4 py-2 text-sm font-semibold text-black hover:bg-theme-accent-hover"
+            >
+              Open Editor <ArrowRight size={16} />
+            </Link>
+          </div>
         </nav>
 
         <header className="mt-14 grid gap-10 lg:grid-cols-2 lg:items-center">

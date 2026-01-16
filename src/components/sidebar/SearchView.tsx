@@ -1,6 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { ChevronRight, FileText, Hash, Replace, ReplaceAll } from 'lucide-react';
-import { useApp } from '../../AppContext';
+import React, { useEffect, useState } from "react";
+import {
+  ChevronRight,
+  FileText,
+  Hash,
+  Replace,
+  ReplaceAll,
+} from "lucide-react";
+import { useApp } from "../../AppContext";
 
 interface SearchMatch {
   fileId: string;
@@ -14,9 +20,10 @@ interface SearchMatch {
 }
 
 const SearchView: React.FC = () => {
-  const { files, updateFileContent, setActiveFile, setPendingScroll } = useApp();
-  const [query, setQuery] = useState('');
-  const [replaceQuery, setReplaceQuery] = useState('');
+  const { files, updateFileContent, setActiveFile, setPendingScroll } =
+    useApp();
+  const [query, setQuery] = useState("");
+  const [replaceQuery, setReplaceQuery] = useState("");
   const [isRegex, setIsRegex] = useState(false);
   const [isCaseSensitive, setIsCaseSensitive] = useState(false);
   const [results, setResults] = useState<SearchMatch[]>([]);
@@ -38,13 +45,15 @@ const SearchView: React.FC = () => {
   const performSearch = () => {
     let matches: SearchMatch[] = [];
 
-    if (query.startsWith('#') && query.length > 1) {
+    if (query.startsWith("#") && query.length > 1) {
       const tagQuery = query.substring(1).toLowerCase();
       files
-        .filter(f => f.type === 'file')
-        .forEach(file => {
+        .filter((f) => f.type === "file")
+        .forEach((file) => {
           const fileTags = file.tags || [];
-          const matchedTags = fileTags.filter(t => t.toLowerCase().includes(tagQuery));
+          const matchedTags = fileTags.filter((t) =>
+            t.toLowerCase().includes(tagQuery)
+          );
 
           if (matchedTags.length > 0) {
             matches.push({
@@ -52,10 +61,10 @@ const SearchView: React.FC = () => {
               fileName: file.name,
               line: 0,
               col: 0,
-              context: `Matched Tags: ${matchedTags.join(', ')}`,
+              context: `Matched Tags: ${matchedTags.join(", ")}`,
               fullMatch: matchedTags[0],
               index: 0,
-              isTag: true
+              isTag: true,
             });
           }
         });
@@ -66,15 +75,17 @@ const SearchView: React.FC = () => {
     let regex: RegExp;
 
     try {
-      const flags = isCaseSensitive ? 'gm' : 'gim';
-      regex = isRegex ? new RegExp(query, flags) : new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), flags);
+      const flags = isCaseSensitive ? "gm" : "gim";
+      regex = isRegex
+        ? new RegExp(query, flags)
+        : new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), flags);
     } catch {
       return;
     }
 
     files
-      .filter(f => f.type === 'file')
-      .forEach(file => {
+      .filter((f) => f.type === "file")
+      .forEach((file) => {
         const content = file.content;
         let match;
 
@@ -88,11 +99,11 @@ const SearchView: React.FC = () => {
 
           const index = match.index;
           const textBeforeMatch = content.substring(0, index);
-          const line = textBeforeMatch.split('\n').length;
-          const lineStartIdx = textBeforeMatch.lastIndexOf('\n') + 1;
+          const line = textBeforeMatch.split("\n").length;
+          const lineStartIdx = textBeforeMatch.lastIndexOf("\n") + 1;
           const col = index - lineStartIdx + 1;
 
-          const lineEndIdx = content.indexOf('\n', index);
+          const lineEndIdx = content.indexOf("\n", index);
           const contextEnd = lineEndIdx === -1 ? content.length : lineEndIdx;
           const context = content.substring(lineStartIdx, contextEnd);
 
@@ -103,7 +114,7 @@ const SearchView: React.FC = () => {
             col,
             context,
             fullMatch: match[0],
-            index
+            index,
           });
         }
       });
@@ -112,12 +123,15 @@ const SearchView: React.FC = () => {
 
   const handleReplace = async (match: SearchMatch) => {
     if (match.isTag) return;
-    const file = files.find(f => f.id === match.fileId);
+    const file = files.find((f) => f.id === match.fileId);
     if (!file) return;
 
-    const currentMatch = file.content.substring(match.index, match.index + match.fullMatch.length);
+    const currentMatch = file.content.substring(
+      match.index,
+      match.index + match.fullMatch.length
+    );
     if (currentMatch !== match.fullMatch) {
-      alert('File content has changed. Rescanning...');
+      alert("File content has changed. Rescanning...");
       performSearch();
       return;
     }
@@ -130,24 +144,33 @@ const SearchView: React.FC = () => {
   };
 
   const handleReplaceAll = async () => {
-    if (!confirm(`Replace ${results.length} occurrences across ${new Set(results.map(r => r.fileId)).size} files?`)) return;
+    if (
+      !confirm(
+        `Replace ${results.length} occurrences across ${
+          new Set(results.map((r) => r.fileId)).size
+        } files?`
+      )
+    )
+      return;
 
     const filesToUpdate = new Map<string, SearchMatch[]>();
     results
-      .filter(r => !r.isTag)
-      .forEach(r => {
+      .filter((r) => !r.isTag)
+      .forEach((r) => {
         if (!filesToUpdate.has(r.fileId)) filesToUpdate.set(r.fileId, []);
         filesToUpdate.get(r.fileId)!.push(r);
       });
 
     for (const [fileId] of filesToUpdate) {
-      const file = files.find(f => f.id === fileId);
+      const file = files.find((f) => f.id === fileId);
       if (file) {
         let content = file.content;
         let regex: RegExp;
         try {
-          const flags = isCaseSensitive ? 'gm' : 'gim';
-          regex = isRegex ? new RegExp(query, flags) : new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), flags);
+          const flags = isCaseSensitive ? "gm" : "gim";
+          regex = isRegex
+            ? new RegExp(query, flags)
+            : new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), flags);
           content = content.replace(regex, replaceQuery);
           await updateFileContent(fileId, content);
         } catch (e) {
@@ -164,14 +187,11 @@ const SearchView: React.FC = () => {
     }
   };
 
-  const groupedResults = results.reduce(
-    (acc, match) => {
-      if (!acc[match.fileId]) acc[match.fileId] = [];
-      acc[match.fileId].push(match);
-      return acc;
-    },
-    {} as Record<string, SearchMatch[]>
-  );
+  const groupedResults = results.reduce((acc, match) => {
+    if (!acc[match.fileId]) acc[match.fileId] = [];
+    acc[match.fileId].push(match);
+    return acc;
+  }, {} as Record<string, SearchMatch[]>);
 
   return (
     <div className="flex flex-col h-full bg-theme-sidebar">
@@ -181,20 +201,28 @@ const SearchView: React.FC = () => {
             type="text"
             placeholder="Search or #tag"
             value={query}
-            onChange={e => setQuery(e.target.value)}
-            className="w-full bg-theme-activity text-sm text-white px-2 py-1.5 pr-14 rounded border border-theme-border focus:border-theme-accent outline-none"
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full bg-theme-activity text-sm text-theme-text-main px-2 py-1.5 pr-14 rounded border border-theme-border focus:border-theme-accent outline-none"
           />
           <div className="absolute right-1 top-1/2 -translate-y-1/2 flex gap-0.5">
             <button
               onClick={() => setIsCaseSensitive(!isCaseSensitive)}
-              className={`p-0.5 rounded ${isCaseSensitive ? 'bg-theme-accent/20 text-theme-accent' : 'text-theme-text-muted hover:text-white'}`}
+              className={`p-0.5 rounded ${
+                isCaseSensitive
+                  ? "bg-theme-accent/20 text-theme-accent"
+                  : "text-theme-text-muted hover:text-theme-text-main"
+              }`}
               title="Match Case"
             >
               <span className="text-[10px] font-bold px-1">Aa</span>
             </button>
             <button
               onClick={() => setIsRegex(!isRegex)}
-              className={`p-0.5 rounded ${isRegex ? 'bg-theme-accent/20 text-theme-accent' : 'text-theme-text-muted hover:text-white'}`}
+              className={`p-0.5 rounded ${
+                isRegex
+                  ? "bg-theme-accent/20 text-theme-accent"
+                  : "text-theme-text-muted hover:text-theme-text-main"
+              }`}
               title="Use Regular Expression"
             >
               <span className="text-[10px] font-bold px-1">.*</span>
@@ -205,7 +233,9 @@ const SearchView: React.FC = () => {
         <div className="flex gap-2">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className={`text-theme-text-muted hover:text-white transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+            className={`text-theme-text-muted hover:text-theme-text-main transition-transform ${
+              isExpanded ? "rotate-90" : ""
+            }`}
           >
             <ChevronRight size={14} />
           </button>
@@ -216,13 +246,13 @@ const SearchView: React.FC = () => {
                   type="text"
                   placeholder="Replace"
                   value={replaceQuery}
-                  onChange={e => setReplaceQuery(e.target.value)}
-                  className="w-full bg-theme-activity text-sm text-white px-2 py-1.5 pr-8 rounded border border-theme-border focus:border-theme-accent outline-none mb-2"
+                  onChange={(e) => setReplaceQuery(e.target.value)}
+                  className="w-full bg-theme-activity text-sm text-theme-text-main px-2 py-1.5 pr-8 rounded border border-theme-border focus:border-theme-accent outline-none mb-2"
                 />
                 <button
                   onClick={handleReplaceAll}
                   disabled={results.length === 0}
-                  className="p-1 absolute right-1 top-1.5 text-theme-text-muted hover:text-white disabled:opacity-30"
+                  className="p-1 absolute right-1 top-1.5 text-theme-text-muted hover:text-theme-text-main disabled:opacity-30"
                   title="Replace All"
                 >
                   <ReplaceAll size={14} />
@@ -234,14 +264,22 @@ const SearchView: React.FC = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar">
-        {results.length === 0 && query && <div className="p-4 text-center text-xs text-theme-text-muted">No results found</div>}
+        {results.length === 0 && query && (
+          <div className="p-4 text-center text-xs text-theme-text-muted">
+            No results found
+          </div>
+        )}
         {Object.entries(groupedResults).map(([fileId, matches]) => {
           return (
             <div key={fileId} className="flex flex-col">
               <div className="px-3 py-1 bg-theme-activity/50 flex items-center gap-2 sticky top-0 z-10">
                 <FileText size={12} className="text-theme-text-muted" />
-                <span className="text-xs font-bold text-theme-text-main truncate flex-1">{matches[0].fileName}</span>
-                <span className="text-[10px] bg-theme-hover px-1.5 rounded-full text-theme-text-muted">{matches.length}</span>
+                <span className="text-xs font-bold text-theme-text-main truncate flex-1">
+                  {matches[0].fileName}
+                </span>
+                <span className="text-[10px] bg-theme-hover px-1.5 rounded-full text-theme-text-muted">
+                  {matches.length}
+                </span>
               </div>
               <div>
                 {matches.map((match, idx) => (
@@ -251,7 +289,9 @@ const SearchView: React.FC = () => {
                     onClick={() => navigateToMatch(match)}
                   >
                     {!match.isTag && (
-                      <span className="text-[10px] text-theme-text-dim font-mono mt-0.5 w-6 text-right shrink-0">{match.line}</span>
+                      <span className="text-[10px] text-theme-text-dim font-mono mt-0.5 w-6 text-right shrink-0">
+                        {match.line}
+                      </span>
                     )}
                     {match.isTag && (
                       <span className="text-[10px] text-theme-accent font-mono mt-0.5 w-6 text-right shrink-0">
@@ -259,11 +299,13 @@ const SearchView: React.FC = () => {
                       </span>
                     )}
                     <div className="flex-1 min-w-0 overflow-hidden text-xs text-theme-text-muted">
-                      <span className="whitespace-pre font-mono truncate block">{match.context}</span>
+                      <span className="whitespace-pre font-mono truncate block">
+                        {match.context}
+                      </span>
                     </div>
                     {isExpanded && !match.isTag && (
                       <button
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleReplace(match);
                         }}
@@ -285,4 +327,3 @@ const SearchView: React.FC = () => {
 };
 
 export default SearchView;
-

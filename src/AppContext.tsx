@@ -13,6 +13,7 @@ export interface AppContextType {
   expandedFolders: Set<string>;
   showPreview: boolean;
   showSidebar: boolean;
+  theme: "dark" | "light";
   features: MarkdownFeatures;
   previewTheme: PreviewTheme;
   refreshFiles: () => Promise<void>;
@@ -35,6 +36,8 @@ export interface AppContextType {
   toggleFolder: (id: string) => void;
   togglePreview: () => void;
   toggleSidebar: () => void;
+  setTheme: (theme: "dark" | "light") => void;
+  toggleTheme: () => void;
   toggleFeature: (key: keyof MarkdownFeatures) => void;
   setPreviewTheme: (theme: PreviewTheme) => void;
   openPalette: () => void;

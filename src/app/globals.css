@@ -17,7 +17,12 @@
   --accent-hover: #059669;
 }
 
+html.dark {
+  color-scheme: dark;
+}
+
 html.light {
+  color-scheme: light;
   --bg-main: #ffffff;
   --bg-header: #f8fafc;
   --bg-sidebar: #f8fafc;

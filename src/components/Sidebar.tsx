@@ -17,8 +17,8 @@ const Sidebar: React.FC = () => {
             onClick={() => setActiveTab("explorer")}
             className={`flex-1 flex items-center justify-center py-2.5 transition-colors border-b-2 ${
               activeTab === "explorer"
-                ? "border-theme-accent text-white"
-                : "border-transparent text-theme-text-muted hover:text-white"
+                ? "border-theme-accent text-theme-text-main"
+                : "border-transparent text-theme-text-muted hover:text-theme-text-main"
             }`}
             title="Explorer"
           >
@@ -28,8 +28,8 @@ const Sidebar: React.FC = () => {
             onClick={() => setActiveTab("search")}
             className={`flex-1 flex items-center justify-center py-2.5 transition-colors border-b-2 ${
               activeTab === "search"
-                ? "border-theme-accent text-white"
-                : "border-transparent text-theme-text-muted hover:text-white"
+                ? "border-theme-accent text-theme-text-main"
+                : "border-transparent text-theme-text-muted hover:text-theme-text-main"
             }`}
             title="Search"
           >

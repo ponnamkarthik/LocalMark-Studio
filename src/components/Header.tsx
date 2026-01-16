@@ -11,6 +11,8 @@ import {
   Upload,
   Search,
   Info,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useApp } from "../AppContext";
 import { exportService } from "../services/exportService";
@@ -25,6 +27,8 @@ const Header: React.FC = () => {
     previewTheme,
     openMetadata,
     features,
+    theme,
+    toggleTheme,
   } = useApp();
   const activeFile = files.find((f) => f.id === activeFileId);
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -124,7 +128,7 @@ const Header: React.FC = () => {
         <Icon size={18} strokeWidth={1.5} />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-theme-text-main group-hover:text-white leading-none mb-1">
+        <div className="text-sm font-medium text-theme-text-main group-hover:text-theme-text-main leading-none mb-1">
           {label}
         </div>
         <div className="text-[11px] text-theme-text-muted truncate group-hover:text-theme-text-dim leading-none opacity-80">
@@ -207,8 +211,21 @@ const Header: React.FC = () => {
         )}
 
         <button
+          onClick={toggleTheme}
+          className="p-1.5 rounded-md text-theme-text-muted hover:text-theme-text-main hover:bg-theme-activity transition-colors"
+          title={
+            theme === "dark" ? "Switch to light theme" : "Switch to dark theme"
+          }
+          aria-label={
+            theme === "dark" ? "Switch to light theme" : "Switch to dark theme"
+          }
+        >
+          {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
+
+        <button
           onClick={handleImportClick}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium bg-theme-activity border border-transparent text-theme-text-muted hover:text-white hover:bg-theme-hover transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium bg-theme-activity border border-transparent text-theme-text-muted hover:text-theme-text-main hover:bg-theme-hover transition-colors"
         >
           <Upload size={14} />
           <span>Import</span>
@@ -222,8 +239,8 @@ const Header: React.FC = () => {
                         flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors border
                         ${
                           isExportOpen
-                            ? "bg-theme-active border-theme-border text-white shadow-sm"
-                            : "bg-theme-activity border-transparent text-theme-text-muted hover:text-white hover:bg-theme-hover"
+                            ? "bg-theme-active border-theme-border text-theme-text-main shadow-sm"
+                            : "bg-theme-activity border-transparent text-theme-text-muted hover:text-theme-text-main hover:bg-theme-hover"
                         }
                     `}
             >
@@ -238,7 +255,7 @@ const Header: React.FC = () => {
             </button>
 
             {isExportOpen && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-[#161b22] border border-theme-border rounded-xl shadow-2xl shadow-black/60 overflow-hidden p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right ring-1 ring-white/5 backdrop-blur-xl">
+              <div className="absolute top-full right-0 mt-2 w-72 bg-theme-header border border-theme-border rounded-xl shadow-2xl shadow-black/20 overflow-hidden p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right ring-1 ring-theme-border/50 backdrop-blur-xl">
                 <div className="px-2 py-1.5 flex items-center justify-between">
                   <span className="text-[10px] font-bold text-theme-text-muted uppercase tracking-wider">
                     Document Export
@@ -294,6 +311,7 @@ const Header: React.FC = () => {
         <div className="w-px h-5 bg-theme-border mx-1" />
 
         <a
+          target="_blank"
           href="https://github.com/ponnamkarthik/LocalMark-Studio"
           className="text-theme-text-muted hover:text-theme-text-main transition-colors"
         >
