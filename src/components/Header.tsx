@@ -294,7 +294,7 @@ const Header: React.FC = () => {
         <div className="w-px h-5 bg-theme-border mx-1" />
 
         <a
-          href="#"
+          href="https://github.com/ponnamkarthik/LocalMark-Studio"
           className="text-theme-text-muted hover:text-theme-text-main transition-colors"
         >
           <Github size={20} />
