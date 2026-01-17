@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     url: "/",
     images: [
       {
-        url: "/og-image.svg",
+        url: "/og-image.webp",
         width: 1200,
         height: 630,
         alt: siteTitle,
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteTitleWithKeyword,
     description: siteDescription,
-    images: ["/og-image.svg"],
+    images: ["/og-image.webp"],
   },
 
   icons: {
