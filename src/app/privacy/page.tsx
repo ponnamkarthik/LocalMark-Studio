@@ -18,6 +18,14 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/privacy`,
     title: `Privacy Policy | ${SITE_NAME}`,
     description: `Privacy policy for ${SITE_NAME}.`,
+    images: [
+      {
+        url: "/og-image.webp",
+        width: 1200,
+        height: 630,
+        alt: SITE_NAME,
+      },
+    ],
   },
 };
 

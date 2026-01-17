@@ -14,11 +14,21 @@ export const metadata: Metadata = {
     title: `Editor | ${siteTitle}`,
     description:
       "Open the LocalMark Studio editor — a local-first Markdown editor with file management, intelligent paste, and split-pane preview.",
+    images: [
+      {
+        url: "/og-image.webp",
+        width: 1200,
+        height: 630,
+        alt: siteTitle,
+      },
+    ],
   },
   twitter: {
+    card: "summary_large_image",
     title: `Editor | ${siteTitle}`,
     description:
       "Open the LocalMark Studio editor — a local-first Markdown editor with file management, intelligent paste, and split-pane preview.",
+    images: ["/og-image.webp"],
   },
   robots: {
     index: true,

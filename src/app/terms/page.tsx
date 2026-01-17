@@ -18,6 +18,14 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/terms`,
     title: `Terms of Service | ${SITE_NAME}`,
     description: `Terms of service for ${SITE_NAME}.`,
+    images: [
+      {
+        url: "/og-image.webp",
+        width: 1200,
+        height: 630,
+        alt: SITE_NAME,
+      },
+    ],
   },
 };
 
