@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 import { useApp } from "../../AppContext";
 import { FileTreeItem } from "../../types";
 import {
@@ -6,19 +8,20 @@ import {
   ChevronRight,
   Edit2,
   File,
+  FilePlus,
   FileText,
   Folder,
+  FolderPlus,
   FolderOpen,
-  Plus,
-  PlusCircle,
   Trash2,
 } from "lucide-react";
 
 interface FileTreeNodeProps {
   node: FileTreeItem;
+  activeDragId: string | null;
 }
 
-const FileTreeNode: React.FC<FileTreeNodeProps> = ({ node }) => {
+const FileTreeNode: React.FC<FileTreeNodeProps> = ({ node, activeDragId }) => {
   const {
     activeFileId,
     expandedFolders,
@@ -27,6 +30,7 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({ node }) => {
     deleteNode,
     renameNode,
     createFile,
+    moveNode,
   } = useApp();
 
   const [isHovered, setIsHovered] = useState(false);
@@ -39,7 +43,8 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({ node }) => {
 
   const isExpanded = expandedFolders.has(node.id);
   const isActive = activeFileId === node.id;
-  const paddingLeft = `${node.depth * 12 + 12}px`;
+  const indentPx = node.depth * 12 + 12;
+  const paddingLeft = `${indentPx}px`;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -101,9 +106,28 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({ node }) => {
     setIsCreatingChild(null);
   };
 
+  const isDraggable = !isRenaming && !isCreatingChild;
+  const { setNodeRef: setDragNodeRef, attributes, listeners, transform, isDragging } =
+    useDraggable({ id: node.id, disabled: !isDraggable });
+  const { setNodeRef: setDropNodeRef, isOver } = useDroppable({ id: node.id });
+
+  const setNodeRef = (el: HTMLDivElement | null) => {
+    setDragNodeRef(el);
+    setDropNodeRef(el);
+  };
+
+  const showFolderDropHighlight =
+    isOver && node.type === "folder" && !!activeDragId && activeDragId !== node.id;
+
+  const dragStyle: React.CSSProperties = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.35 : undefined,
+  };
+
   return (
     <div>
       <div
+        ref={setNodeRef}
         className={`
             flex items-center group cursor-pointer text-sm py-1 pr-2 relative transition-colors
             ${
@@ -111,55 +135,63 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({ node }) => {
                 ? "bg-theme-active text-theme-text-main border-l-2 border-theme-accent"
                 : "text-theme-text-muted hover:bg-theme-hover hover:text-theme-text-main border-l-2 border-transparent"
             }
+            ${showFolderDropHighlight ? "bg-theme-hover" : ""}
         `}
         style={{
+          ...dragStyle,
           paddingLeft: isActive ? `calc(${paddingLeft} - 2px)` : paddingLeft,
         }}
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <span className="mr-1 opacity-80">
-          {node.type === "folder" &&
-            (isExpanded ? (
-              <ChevronDown size={14} />
-            ) : (
-              <ChevronRight size={14} />
-            ))}
-          {node.type === "file" && <span className="w-[14px] inline-block" />}
-        </span>
+        <div
+          className="flex items-center flex-1 min-w-0"
+          {...attributes}
+          {...listeners}
+        >
+          <span className="mr-1 opacity-80">
+            {node.type === "folder" &&
+              (isExpanded ? (
+                <ChevronDown size={14} />
+              ) : (
+                <ChevronRight size={14} />
+              ))}
+            {node.type === "file" && <span className="w-[14px] inline-block" />}
+          </span>
 
-        <span className="mr-2 text-theme-accent opacity-90">
-          {node.type === "folder" ? (
-            isExpanded ? (
-              <FolderOpen size={16} />
+          <span className="mr-2 text-theme-accent opacity-90">
+            {node.type === "folder" ? (
+              isExpanded ? (
+                <FolderOpen size={16} />
+              ) : (
+                <Folder size={16} />
+              )
             ) : (
-              <Folder size={16} />
-            )
-          ) : (
-            <FileText
-              size={16}
-              className={
-                isActive ? "text-theme-text-main" : "text-theme-text-dim"
-              }
+              <FileText
+                size={16}
+                className={
+                  isActive ? "text-theme-text-main" : "text-theme-text-dim"
+                }
+              />
+            )}
+          </span>
+
+          {isRenaming ? (
+            <input
+              type="text"
+              autoFocus
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onBlur={handleRenameSubmit}
+              onKeyDown={handleRenameKeyDown}
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 bg-theme-activity text-theme-text-main px-1 outline-none border border-theme-accent rounded-sm h-5 text-sm min-w-0"
             />
+          ) : (
+            <span className="truncate flex-1">{node.name}</span>
           )}
-        </span>
-
-        {isRenaming ? (
-          <input
-            type="text"
-            autoFocus
-            value={renameValue}
-            onChange={(e) => setRenameValue(e.target.value)}
-            onBlur={handleRenameSubmit}
-            onKeyDown={handleRenameKeyDown}
-            onClick={(e) => e.stopPropagation()}
-            className="flex-1 bg-theme-activity text-theme-text-main px-1 outline-none border border-theme-accent rounded-sm h-5 text-sm min-w-0"
-          />
-        ) : (
-          <span className="truncate flex-1">{node.name}</span>
-        )}
+        </div>
 
         {isHovered && !isRenaming && (
           <div className="flex items-center gap-0.5 bg-theme-hover ml-2 shadow-sm rounded-sm overflow-hidden">
@@ -177,14 +209,14 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({ node }) => {
                   title="New File"
                   className="p-1 hover:bg-theme-activity hover:text-theme-text-main text-theme-text-muted transition-colors"
                 >
-                  <Plus size={13} />
+                  <FilePlus size={13} />
                 </button>
                 <button
                   onClick={(e) => handleAddChild(e, "folder")}
                   title="New Folder"
                   className="p-1 hover:bg-theme-activity hover:text-theme-text-main text-theme-text-muted transition-colors"
                 >
-                  <PlusCircle size={13} />
+                  <FolderPlus size={13} />
                 </button>
               </>
             )}
@@ -224,7 +256,11 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({ node }) => {
       {node.type === "folder" && isExpanded && node.children && (
         <div>
           {node.children.map((child) => (
-            <FileTreeNode key={child.id} node={child} />
+            <FileTreeNode
+              key={child.id}
+              node={child}
+              activeDragId={activeDragId}
+            />
           ))}
         </div>
       )}

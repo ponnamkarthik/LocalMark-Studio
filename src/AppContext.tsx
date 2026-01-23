@@ -32,6 +32,7 @@ export interface AppContextType {
   ) => Promise<void>;
   renameNode: (id: string, newName: string) => Promise<void>;
   deleteNode: (id: string) => Promise<void>;
+  moveNode: (id: string, newParentId: string | null) => Promise<void>;
   setActiveFile: (id: string | null) => void;
   toggleFolder: (id: string) => void;
   togglePreview: () => void;

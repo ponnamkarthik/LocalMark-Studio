@@ -22,6 +22,7 @@ import { buildTree } from "../utils/buildTree";
 import { useCommandPaletteCommands } from "../hooks/useCommandPaletteCommands";
 import { useScrollSync } from "../hooks/useScrollSync";
 import { htmlToMarkdown } from "../services/turndownService";
+import { requestPersistentStorage } from "../services/storagePersistence";
 
 const EditorArea = dynamic(() => import("../components/EditorArea"), {
   ssr: false,
@@ -290,6 +291,7 @@ const EditorApp: React.FC = () => {
   // Initial Load
   useEffect(() => {
     const init = async () => {
+      void requestPersistentStorage();
       await dbService.init();
       await dbService.seedIfEmpty();
       await refreshFiles();
@@ -337,9 +339,9 @@ const EditorApp: React.FC = () => {
       isOpen: type === "file",
     };
     await dbService.saveFile(newNode);
-    if (type === "file") setActiveFileId(newNode.id);
     if (parentId) setExpandedFolders((prev) => new Set(prev).add(parentId));
     await refreshFiles();
+    if (type === "file") setActiveFileId(newNode.id);
   };
 
   const importFile = async (name: string, content: string) => {
@@ -417,6 +419,49 @@ const EditorApp: React.FC = () => {
     await dbService.renameFile(id, newName);
     await refreshFiles();
   };
+
+  const moveNode = useCallback(
+    async (id: string, newParentId: string | null) => {
+      const node = files.find((f) => f.id === id);
+      if (!node) return;
+
+      if (newParentId === node.parentId) return;
+      if (newParentId === node.id) return;
+
+      if (newParentId) {
+        const targetParent = files.find((f) => f.id === newParentId);
+        if (!targetParent || targetParent.type !== "folder") return;
+
+        if (node.type === "folder") {
+          const descendantIds = new Set<string>();
+          const collect = (pid: string) => {
+            files
+              .filter((f) => f.parentId === pid)
+              .forEach((child) => {
+                descendantIds.add(child.id);
+                if (child.type === "folder") collect(child.id);
+              });
+          };
+          collect(node.id);
+
+          if (descendantIds.has(newParentId)) return;
+        }
+      }
+
+      const updated: FileNode = {
+        ...node,
+        parentId: newParentId,
+        updatedAt: Date.now(),
+      };
+
+      await dbService.saveFile(updated);
+      if (newParentId) {
+        setExpandedFolders((prev) => new Set(prev).add(newParentId));
+      }
+      await refreshFiles();
+    },
+    [files, refreshFiles]
+  );
 
   const deleteNode = useCallback(
     async (id: string) => {
@@ -515,6 +560,7 @@ const EditorApp: React.FC = () => {
         updateFileMetadata,
         renameNode,
         deleteNode,
+        moveNode,
         setActiveFile,
         toggleFolder,
         togglePreview,
